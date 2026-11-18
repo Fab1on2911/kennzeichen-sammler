@@ -1,10 +1,5 @@
-from pathlib import Path
-import zipfile, textwrap
 
-out = Path("/mnt/data/kennzeichen-sammler")
-out.mkdir(exist_ok=True)
-
-html = r'''<!doctype html>
+<!doctype html>
 <html lang="de">
 <head>
 <meta charset="utf-8">
@@ -12,145 +7,878 @@ html = r'''<!doctype html>
 <meta name="theme-color" content="#101827">
 <title>Kennzeichen-Sammler</title>
 <style>
-:root{color-scheme:dark;--bg:#0b1220;--panel:#141f30;--panel2:#1b2a3e;--text:#f4f7fb;--muted:#a9b7c9;--line:#2c3c52;--accent:#69b7ff;--good:#62d6a4;--warn:#ffd479}
-*{box-sizing:border-box}body{margin:0;background:linear-gradient(160deg,#101d31,#0b1220 55%);color:var(--text);font:16px/1.45 system-ui,-apple-system,Segoe UI,sans-serif;min-height:100vh}
-main{max-width:760px;margin:auto;padding:24px 16px 48px}.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
-h1{font-size:clamp(1.55rem,5vw,2.1rem);margin:0}.tag{border:1px solid #31506d;color:#b9ddff;border-radius:999px;padding:5px 10px;font-size:.82rem}
-.sub{color:var(--muted);margin:6px 0 20px}.panel{background:rgba(20,31,48,.96);border:1px solid var(--line);border-radius:18px;padding:18px;margin:14px 0}
-.count{font-size:2rem;font-weight:750}.muted{color:var(--muted);font-size:.9rem}
-label{display:block;font-weight:650;margin:12px 0 7px}input{width:100%;min-width:0;background:#0d1726;color:var(--text);border:1px solid #40536c;border-radius:12px;padding:13px 14px;font:inherit;outline:none}input:focus{border-color:var(--accent);box-shadow:0 0 0 3px #69b7ff25}
-button,.filebtn{border:0;border-radius:12px;padding:11px 14px;font:inherit;font-weight:650;cursor:pointer;background:var(--accent);color:#071321}
-button.secondary,.filebtn.secondary{background:var(--panel2);color:var(--text);border:1px solid var(--line)}button.danger{background:#482631;color:#ffdce2;border:1px solid #70404d}
-.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:12px}.actions button{flex:1}
-.notice{margin-top:12px;padding:10px 12px;border-radius:10px;background:#1d3045;color:#cde7ff}.notice.good{background:#12362f;color:#a8f1d4}.notice.warn{background:#3d321b;color:#ffe2a1}
-.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between}.seg{display:flex;gap:5px;background:#0d1726;padding:4px;border-radius:12px}.seg button{background:transparent;color:var(--muted);padding:8px 11px}.seg button.active{background:#28435f;color:white}
-.list{list-style:none;padding:0;margin:12px 0 0}.item{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-top:1px solid var(--line)}.plate{font-weight:750;letter-spacing:.07em;font-size:1.05rem}.num{color:var(--muted);font-size:.8rem;margin-right:9px}
-.empty{text-align:center;color:var(--muted);padding:28px 8px}.smallprint{color:var(--muted);font-size:.82rem;margin-top:18px}
-footer{color:var(--muted);font-size:.82rem;margin-top:22px}
-@media(max-width:420px){main{padding:18px 12px 36px}.panel{padding:15px}.top{align-items:flex-start}}
+:root {
+  color-scheme: dark;
+  --bg:#0b1220;
+  --panel:#141f30;
+  --panel2:#1b2a3e;
+  --text:#f4f7fb;
+  --muted:#a9b7c9;
+  --line:#2c3c52;
+  --accent:#69b7ff;
+  --good:#62d6a4;
+}
+* { box-sizing:border-box }
+body {
+  margin:0;
+  background:linear-gradient(160deg,#101d31,#0b1220 55%);
+  color:var(--text);
+  font:16px/1.45 system-ui,-apple-system,Segoe UI,sans-serif;
+  min-height:100vh;
+}
+main { max-width:760px;margin:auto;padding:24px 16px 48px }
+.top { display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px }
+h1 { font-size:clamp(1.55rem,5vw,2.1rem);margin:0 }
+h2 { font-size:1.12rem;margin:0 }
+.tag { border:1px solid #31506d;color:#b9ddff;border-radius:999px;padding:5px 10px;font-size:.82rem }
+.sub,.muted,.smallprint,footer { color:var(--muted) }
+.sub { margin:6px 0 20px }
+.panel { background:rgba(20,31,48,.96);border:1px solid var(--line);border-radius:18px;padding:18px;margin:14px 0 }
+.count { font-size:2rem;font-weight:750 }
+.muted { font-size:.9rem }
+label { display:block;font-weight:650;margin:12px 0 7px }
+input {
+  width:100%;min-width:0;background:#0d1726;color:var(--text);
+  border:1px solid #40536c;border-radius:12px;padding:13px 14px;
+  font:inherit;outline:none
+}
+input:focus { border-color:var(--accent);box-shadow:0 0 0 3px #69b7ff25 }
+button,.filebtn {
+  border:0;border-radius:12px;padding:11px 14px;font:inherit;
+  font-weight:650;cursor:pointer;background:var(--accent);color:#071321
+}
+button.secondary,.filebtn.secondary {
+  background:var(--panel2);color:var(--text);border:1px solid var(--line)
+}
+button.danger { background:#482631;color:#ffdce2;border:1px solid #70404d }
+.actions { display:flex;gap:9px;flex-wrap:wrap;margin-top:12px }
+.actions button { flex:1 }
+.notice { margin-top:12px;padding:10px 12px;border-radius:10px;background:#1d3045;color:#cde7ff }
+.notice.good { background:#12362f;color:#a8f1d4 }
+.notice.warn { background:#3d321b;color:#ffe2a1 }
+.toolbar { display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between }
+.seg { display:flex;gap:5px;background:#0d1726;padding:4px;border-radius:12px }
+.seg button { background:transparent;color:var(--muted);padding:8px 11px }
+.seg button.active { background:#28435f;color:white }
+.list { list-style:none;padding:0;margin:12px 0 0 }
+.item { display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-top:1px solid var(--line) }
+.plate { font-weight:750;letter-spacing:.07em;font-size:1.05rem }
+.region-label {
+  display:inline-block;color:var(--muted);font-size:.76rem;
+  font-weight:400;letter-spacing:normal;margin-left:7px
+}
+.num { color:var(--muted);font-size:.8rem;margin-right:9px }
+.empty { text-align:center;color:var(--muted);padding:28px 8px }
+.smallprint { font-size:.82rem;margin-top:18px }
+footer { font-size:.82rem;margin-top:22px }
+@media(max-width:420px) {
+  main { padding:18px 12px 36px }
+  .panel { padding:15px }
+  .top { align-items:flex-start }
+  .item { align-items:flex-start }
+}
 </style>
 </head>
 <body>
 <main>
-  <div class="top"><h1>🌍 Kennzeichen-Sammler</h1><span class="tag">Weltweit</span></div>
-  <p class="sub">Sammle vollständige Autokennzeichen und erkenne sofort, wenn du eines schon gespeichert hast.</p>
+  <div class="top">
+    <h1>🌍 Kennzeichen-Sammler</h1>
+    <span class="tag">Weltweit</span>
+  </div>
+
+  <p class="sub">
+    Sammle vollständige Autokennzeichen und erkenne sofort,
+    wenn du eines schon gespeichert hast.
+  </p>
 
   <section class="panel" aria-label="Sammlungsübersicht">
-    <div class="count" id="count">0</div><div class="muted">Gesammelte Kennzeichen</div>
+    <div class="count" id="count">0</div>
+    <div class="muted">Gesammelte Kennzeichen</div>
   </section>
 
   <section class="panel">
-    <h2 style="font-size:1.12rem;margin:0">Kennzeichen hinzufügen</h2>
+    <h2>Kennzeichen hinzufügen</h2>
     <form id="addForm">
       <label for="plateInput">Vollständiges Kennzeichen</label>
-      <input id="plateInput" autocomplete="off" autocapitalize="characters" placeholder="z. B. HH FB1234" maxlength="30">
-      <div class="muted" style="margin-top:7px">Deutsche Schreibweise wird automatisch formatiert: HH FB1234 → HH FB 1234. Andere internationale Schreibweisen bleiben erhalten.</div>
-      <div class="actions"><button type="submit">＋ Speichern</button></div>
+      <input id="plateInput" autocomplete="off"
+        autocapitalize="characters"
+        placeholder="z. B. HH FB1234" maxlength="30">
+
+      <div class="muted" style="margin-top:7px">
+        Deutsche Schreibweise wird automatisch formatiert.
+      </div>
+
+      <div class="actions">
+        <button type="submit">＋ Speichern</button>
+      </div>
     </form>
-    <div id="notice" class="notice" role="status" aria-live="polite" hidden></div>
+    <div id="notice" class="notice" role="status"
+      aria-live="polite" hidden></div>
   </section>
 
   <section class="panel">
     <div class="toolbar">
-      <h2 style="font-size:1.12rem;margin:0">Deine Sammlung</h2>
+      <h2>Deine Sammlung</h2>
       <div class="seg" role="group" aria-label="Sortierung">
-        <button type="button" id="sortRegion" class="active" aria-pressed="true">Region</button>
-        <button type="button" id="sortLetters" aria-pressed="false">Buchstaben</button>
+        <button type="button" id="sortRegion" class="active"
+          aria-pressed="true">Region</button>
+        <button type="button" id="sortLetters"
+          aria-pressed="false">Buchstaben</button>
       </div>
     </div>
+
     <label for="search">Sammlung durchsuchen</label>
-    <input id="search" placeholder="Kennzeichen suchen …" autocomplete="off">
+    <input id="search" placeholder="Kennzeichen suchen …"
+      autocomplete="off">
+
     <ul id="plateList" class="list"></ul>
-    <div id="empty" class="empty" hidden>Noch keine Kennzeichen gespeichert.</div>
+    <div id="empty" class="empty" hidden>
+      Noch keine Kennzeichen gespeichert.
+    </div>
+
     <div class="actions">
-      <button type="button" class="secondary" id="exportBtn">↓ Sicherung exportieren</button>
-      <label class="filebtn secondary" for="importFile" style="margin:0;text-align:center;cursor:pointer">↑ Sicherung importieren</label>
-      <input id="importFile" type="file" accept=".json,application/json" hidden>
+      <button type="button" class="secondary" id="exportBtn">
+        ↓ Sicherung exportieren
+      </button>
+      <label class="filebtn secondary" for="importFile"
+        style="margin:0;text-align:center;cursor:pointer">
+        ↑ Sicherung importieren
+      </label>
+      <input id="importFile" type="file"
+        accept=".json,application/json" hidden>
     </div>
   </section>
 
-  <p class="smallprint">Deine Sammlung wird lokal in diesem Browser auf diesem Gerät gespeichert. Sie wird nicht automatisch mit anderen Geräten synchronisiert. Exportiere regelmäßig eine Sicherung, damit du sie bei einem Gerätewechsel wiederherstellen kannst.</p>
+  <p class="smallprint">
+    Deine Sammlung wird lokal in diesem Browser auf diesem Gerät
+    gespeichert. Sie wird nicht automatisch mit anderen Geräten
+    synchronisiert. Exportiere regelmäßig eine Sicherung.
+  </p>
+
   <footer>Privater Sammler · Keine Halter- oder Standortdaten eintragen.</footer>
 </main>
+
 <script>
 (() => {
   const KEY = "kennzeichen-sammler-v1";
   const $ = id => document.getElementById(id);
+
   let plates = [];
   let sortMode = "region";
+
+  // Deutsche Ortskürzel und zugehörige Regionen.
+  // Die Liste ist eine Auswahl, keine vollständige historische Datenbank.
+  const GERMAN_REGIONS = {
+    "A":"Augsburg",
+    "AA":"Ostalbkreis",
+    "AB":"Aschaffenburg",
+    "AC":"Städteregion Aachen",
+    "AD":"Darmstadt-Dieburg",
+    "AH":"Ahaus (historisch)",
+    "AK":"Altenkirchen",
+    "AL":"Altena (historisch)",
+    "AM":"Amberg",
+    "AN":"Ansbach",
+    "AO":"Aalen (historisch)",
+    "AP":"Weimarer Land",
+    "AS":"Amberg-Sulzbach",
+    "AU":"Aue (historisch)",
+    "AUR":"Aurich",
+    "AW":"Landkreis Ahrweiler",
+    "AZ":"Alzey-Worms",
+
+    "B":"Berlin",
+    "BA":"Bamberg",
+    "BAD":"Baden-Baden",
+    "BAR":"Barnim",
+    "BB":"Böblingen",
+    "BC":"Biberach",
+    "BE":"Beckum (historisch)",
+    "BER":"Barnim",
+    "BF":"Burgsteinfurt (historisch)",
+    "BI":"Bielefeld",
+    "BIR":"Birkenfeld",
+    "BIT":"Eifelkreis Bitburg-Prüm",
+    "BIW":"Bischofswerda (historisch)",
+    "BK":"Backnang (historisch)",
+    "BL":"Zollernalbkreis",
+    "BLK":"Burgenlandkreis",
+    "BM":"Rhein-Erft-Kreis",
+    "BN":"Bonn",
+    "BO":"Bochum",
+    "BOR":"Borken",
+    "BOT":"Bottrop",
+    "BRA":"Wesermarsch",
+    "BRB":"Brandenburg an der Havel",
+    "BS":"Braunschweig",
+    "BT":"Bayreuth",
+    "BTF":"Anhalt-Bitterfeld",
+    "BÜD":"Büdingen (historisch)",
+    "BUL":"Burglengenfeld (historisch)",
+    "BÜR":"Büren (historisch)",
+    "BÜS":"Büsingen",
+    "BZ":"Bautzen",
+
+    "C":"Chemnitz",
+    "CA":"Calau (historisch)",
+    "CB":"Cottbus",
+    "CE":"Celle",
+    "CHA":"Cham",
+    "CLP":"Cloppenburg",
+    "CO":"Coburg",
+    "COC":"Cochem-Zell",
+    "COE":"Coesfeld",
+    "CR":"Crailsheim (historisch)",
+    "CW":"Calw",
+
+    "D":"Düsseldorf",
+    "DA":"Darmstadt",
+    "DAU":"Vulkaneifel",
+    "DAH":"Dachau",
+    "DAN":"Lüchow-Dannenberg",
+    "DD":"Dresden",
+    "DE":"Dessau-Roßlau",
+    "DGF":"Dingolfing-Landau",
+    "DH":"Diepholz",
+    "DL":"Döbeln (historisch)",
+    "DN":"Düren",
+    "DO":"Dortmund",
+    "DON":"Donau-Ries",
+    "DU":"Duisburg",
+    "DÜW":"Bad Dürkheim",
+
+    "E":"Essen",
+    "EA":"Eisenach",
+    "EBE":"Ebersberg",
+    "ED":"Erding",
+    "EE":"Elbe-Elster",
+    "EF":"Erfurt",
+    "EI":"Eichstätt",
+    "EIC":"Eichsfeld",
+    "EIL":"Eilenburg (historisch)",
+    "EIN":"Einbeck (historisch)",
+    "EL":"Emsland",
+    "EM":"Emmendingen",
+    "EMD":"Emden",
+    "EMS":"Rhein-Lahn-Kreis",
+    "EN":"Ennepe-Ruhr-Kreis",
+    "ER":"Erlangen",
+    "ERB":"Odenwaldkreis",
+    "ERH":"Erlangen-Höchstadt",
+    "ERK":"Erkelenz (historisch)",
+    "ERZ":"Erzgebirgskreis",
+    "ES":"Esslingen",
+    "ESW":"Werra-Meißner-Kreis",
+    "EU":"Euskirchen",
+
+    "F":"Frankfurt am Main",
+    "FB":"Wetteraukreis",
+    "FD":"Fulda",
+    "FDS":"Freudenstadt",
+    "FF":"Frankfurt (Oder)",
+    "FFB":"Fürstenfeldbruck",
+    "FG":"Mittelsachsen",
+    "FI":"Finsterwalde (historisch)",
+    "FL":"Flensburg",
+    "FO":"Forchheim",
+    "FOR":"Forst (historisch)",
+    "FR":"Freiburg",
+    "FRG":"Freyung-Grafenau",
+    "FRI":"Friesland",
+    "FRW":"Bad Freienwalde (historisch)",
+    "FS":"Freising",
+    "FT":"Frankenthal",
+    "FÜ":"Fürth",
+    "FW":"Fürstenwalde (historisch)",
+
+    "G":"Gera",
+    "GAP":"Garmisch-Partenkirchen",
+    "GC":"Glauchau",
+    "GD":"Schwäbisch Gmünd",
+    "GEL":"Geldern (historisch)",
+    "GEO":"Gerolzhofen (historisch)",
+    "GER":"Germersheim",
+    "GF":"Gifhorn",
+    "GG":"Groß-Gerau",
+    "GI":"Gießen",
+    "GL":"Rheinisch-Bergischer Kreis",
+    "GM":"Oberbergischer Kreis",
+    "GN":"Gelnhausen (historisch)",
+    "GNT":"Genthin (historisch)",
+    "GÖ":"Göttingen",
+    "GOA":"St. Goar (historisch)",
+    "GP":"Göppingen",
+    "GR":"Görlitz",
+    "GRZ":"Greiz",
+    "GS":"Goslar",
+    "GT":"Gütersloh",
+    "GTH":"Gotha",
+    "GÜ":"Güstrow (historisch)",
+    "GUN":"Gunzenhausen (historisch)",
+    "GV":"Grevenbroich",
+    "GW":"Greifswald (historisch)",
+    "GZ":"Günzburg",
+
+    "H":"Hannover",
+    "HA":"Hagen",
+    "HAL":"Halle (Saale)",
+    "HAM":"Hamm",
+    "HAS":"Haßberge",
+    "HB":"Bremen",
+    "HBN":"Hildburghausen",
+    "HD":"Heidelberg",
+    "HDH":"Heidenheim",
+    "HE":"Helmstedt",
+    "HEF":"Hersfeld-Rotenburg",
+    "HEI":"Dithmarschen",
+    "HER":"Herne",
+    "HF":"Herford",
+    "HG":"Hochtaunuskreis",
+    "HGW":"Greifswald",
+    "HI":"Hildesheim",
+    "HK":"Heidekreis",
+    "HL":"Lübeck",
+    "HM":"Hameln-Pyrmont",
+    "HN":"Heilbronn",
+    "HO":"Hof",
+    "HOL":"Holzminden",
+    "HOM":"Saarpfalz-Kreis",
+    "HOT":"Hohenstein-Ernstthal",
+    "HP":"Bergstraße",
+    "HR":"Schwalm-Eder-Kreis",
+    "HS":"Heinsberg",
+    "HSK":"Hochsauerlandkreis",
+    "HST":"Stralsund",
+    "HU":"Hanau (historisch)",
+    "HVL":"Havelland",
+    "HWI":"Wismar",
+    "HX":"Höxter",
+    "HY":"Hoyerswerda (historisch)",
+    "HZ":"Harz",
+
+    "I":"Ingolstadt (historisch)",
+    "IL":"Ilm-Kreis",
+    "IN":"Ingolstadt",
+    "IZ":"Steinburg",
+
+    "J":"Jena",
+    "JB":"Jüterbog (historisch)",
+    "JE":"Jessen (historisch)",
+    "JL":"Jerichower Land",
+    "JÜL":"Jülich (historisch)",
+
+    "K":"Köln",
+    "KA":"Karlsruhe",
+    "KB":"Waldeck-Frankenberg",
+    "KC":"Kronach",
+    "KE":"Kempten",
+    "KEH":"Kelheim",
+    "KEM":"Kemnath (historisch)",
+    "KF":"Kaufbeuren",
+    "KG":"Bad Kissingen",
+    "KH":"Bad Kreuznach",
+    "KI":"Kiel",
+    "KIB":"Donnersbergkreis",
+    "KL":"Kaiserslautern",
+    "KLE":"Kleve",
+    "KLZ":"Klötze (historisch)",
+    "KM":"Kamenz (historisch)",
+    "KN":"Konstanz",
+    "KO":"Koblenz",
+    "KÖN":"Königshofen (historisch)",
+    "KÖT":"Köthen (historisch)",
+    "KR":"Krefeld",
+    "KRU":"Krumbach (historisch)",
+    "KS":"Kassel",
+    "KT":"Kitzingen",
+    "KU":"Kulmbach",
+    "KÜN":"Hohenlohekreis",
+    "KUS":"Kusel",
+    "KW":"Königs Wusterhausen (historisch)",
+    "KY":"Kyritz (historisch)",
+
+    "L":"Leipzig",
+    "LA":"Landshut",
+    "LAN":"Landau an der Isar (historisch)",
+    "LAU":"Nürnberger Land",
+    "LB":"Ludwigsburg",
+    "LD":"Landau in der Pfalz",
+    "LDK":"Lahn-Dill-Kreis",
+    "LDS":"Dahme-Spreewald",
+    "LEO":"Leonberg (historisch)",
+    "LER":"Leer",
+    "LEV":"Leverkusen",
+    "LF":"Laufen (historisch)",
+    "LG":"Lüneburg",
+    "LH":"Lüdinghausen (historisch)",
+    "LI":"Lindau",
+    "LIB":"Bad Liebenwerda (historisch)",
+    "LIF":"Lichtenfels",
+    "LIP":"Lippe",
+    "LL":"Landsberg am Lech",
+    "LM":"Limburg-Weilburg",
+    "LN":"Lübben (historisch)",
+    "LÖ":"Lörrach",
+    "LOS":"Oder-Spree",
+    "LS":"Lübbenau (historisch)",
+    "LSZ":"Unstrut-Hainich-Kreis",
+    "LU":"Ludwigshafen",
+    "LÜN":"Lünen (historisch)",
+    "LUP":"Ludwigslust-Parchim",
+
+    "M":"München",
+    "MA":"Mannheim",
+    "MAB":"Marienberg (historisch)",
+    "MB":"Miesbach",
+    "MD":"Magdeburg",
+    "ME":"Mettmann",
+    "MEI":"Meißen",
+    "MEK":"Mittlerer Erzgebirgskreis (historisch)",
+    "MG":"Mönchengladbach",
+    "MGN":"Meiningen",
+    "MH":"Mülheim an der Ruhr",
+    "MI":"Minden-Lübbecke",
+    "MIL":"Miltenberg",
+    "MK":"Märkischer Kreis",
+    "MKK":"Main-Kinzig-Kreis",
+    "ML":"Merseburg (historisch)",
+    "MM":"Memmingen",
+    "MN":"Unterallgäu",
+    "MO":"Moers (historisch)",
+    "MOD":"Marktoberdorf (historisch)",
+    "MOL":"Märkisch-Oderland",
+    "MOS":"Neckar-Odenwald-Kreis",
+    "MQ":"Merseburg-Querfurt (historisch)",
+    "MR":"Marburg-Biedenkopf",
+    "MS":"Münster",
+    "MSH":"Mansfeld-Südharz",
+    "MSP":"Main-Spessart",
+    "MST":"Mecklenburg-Strelitz (historisch)",
+    "MTK":"Main-Taunus-Kreis",
+    "MÜ":"Mühldorf am Inn",
+    "MÜB":"Münchberg (historisch)",
+    "MÜN":"München (historisch)",
+    "MÜR":"Müritz (historisch)",
+    "MVL":"Mecklenburg-Vorpommern",
+    "MW":"Mittweida (historisch)",
+    "MY":"Mayen (historisch)",
+    "MYK":"Mayen-Koblenz",
+
+    "N":"Nürnberg",
+    "NAI":"Naila (historisch)",
+    "NB":"Neubrandenburg",
+    "ND":"Neuburg-Schrobenhausen",
+    "NDH":"Nordhausen",
+    "NE":"Rhein-Kreis Neuss",
+    "NEA":"Neustadt an der Aisch-Bad Windsheim",
+    "NEB":"Nebra (historisch)",
+    "NEC":"Neustadt bei Coburg",
+    "NEW":"Neustadt an der Waldnaab",
+    "NF":"Nordfriesland",
+    "NH":"Neuhaus (historisch)",
+    "NI":"Nienburg/Weser",
+    "NK":"Neunkirchen",
+    "NL":"Niederlausitz (historisch)",
+    "NM":"Neumarkt in der Oberpfalz",
+    "NMB":"Naumburg (historisch)",
+    "NMS":"Neumünster",
+    "NOH":"Grafschaft Bentheim",
+    "NOM":"Northeim",
+    "NP":"Neuruppin (historisch)",
+    "NR":"Neuwied",
+    "NU":"Neu-Ulm",
+    "NW":"Neustadt an der Weinstraße",
+    "NVP":"Nordvorpommern (historisch)",
+    "NWM":"Nordwestmecklenburg",
+    "NY":"Niesky (historisch)",
+
+    "O":"Oldenburg (historisch)",
+    "OA":"Oberallgäu",
+    "OAL":"Ostallgäu",
+    "OB":"Oberhausen",
+    "OBG":"Osterburg (historisch)",
+    "OC":"Oschersleben (historisch)",
+    "OCH":"Ochsenfurt (historisch)",
+    "OD":"Stormarn",
+    "OE":"Olpe",
+    "OF":"Offenbach",
+    "OG":"Ortenaukreis",
+    "OH":"Ostholstein",
+    "OHV":"Oberhavel",
+    "OHZ":"Osterholz",
+    "OK":"Ohrekreis (historisch)",
+    "OL":"Oldenburg",
+    "OP":"Opladen (historisch)",
+    "OS":"Osnabrück",
+    "OSL":"Oberspreewald-Lausitz",
+    "OVI":"Oberviechtach (historisch)",
+    "OVP":"Vorpommern-Greifswald",
+
+    "P":"Potsdam",
+    "PA":"Passau",
+    "PAF":"Pfaffenhofen an der Ilm",
+    "PAN":"Rottal-Inn",
+    "PAR":"Parsberg (historisch)",
+    "PB":"Paderborn",
+    "PCH":"Parchim (historisch)",
+    "PE":"Peine",
+    "PF":"Pforzheim",
+    "PI":"Pinneberg",
+    "PIR":"Sächsische Schweiz-Osterzgebirge",
+    "PL":"Plauen",
+    "PLÖ":"Plön",
+    "PM":"Potsdam-Mittelmark",
+    "PN":"Pößneck (historisch)",
+    "PR":"Prignitz",
+    "PRÜ":"Prüm (historisch)",
+    "PS":"Pirmasens",
+    "PW":"Pasewalk",
+    "PZ":"Prenzlau (historisch)",
+
+    "QFT":"Querfurt (historisch)",
+
+    "R":"Regensburg",
+    "RA":"Rastatt",
+    "RC":"Reichenbach (historisch)",
+    "RD":"Rendsburg-Eckernförde",
+    "RDG":"Ribnitz-Damgarten",
+    "RE":"Recklinghausen",
+    "REG":"Regen",
+    "RG":"Riesa-Großenhain (historisch)",
+    "RH":"Roth",
+    "RI":"Rinteln (historisch)",
+    "RID":"Riedenburg (historisch)",
+    "RIE":"Riesa (historisch)",
+    "RL":"Rochlitz (historisch)",
+    "RM":"Röbel/Müritz (historisch)",
+    "RN":"Rathenow (historisch)",
+    "RO":"Rosenheim",
+    "ROD":"Roding (historisch)",
+    "ROF":"Rotenburg an der Fulda (historisch)",
+    "ROK":"Rockenhausen (historisch)",
+    "ROL":"Rottenburg (historisch)",
+    "ROS":"Rostock",
+    "ROT":"Rothenburg ob der Tauber (historisch)",
+    "ROW":"Rotenburg (Wümme)",
+    "RP":"Rhein-Pfalz-Kreis",
+    "RS":"Remscheid",
+    "RSL":"Roßlau (historisch)",
+    "RT":"Reutlingen",
+    "RU":"Rudolstadt (historisch)",
+    "RÜD":"Rheingau-Taunus-Kreis",
+    "RÜG":"Rügen (historisch)",
+    "RV":"Ravensburg",
+    "RW":"Rottweil",
+    "RZ":"Herzogtum Lauenburg",
+
+    "S":"Stuttgart",
+    "SAB":"Saarburg (historisch)",
+    "SAD":"Schwandorf",
+    "SÄK":"Säckingen (historisch)",
+    "SAN":"Stadtsteinach (historisch)",
+    "SAW":"Altmarkkreis Salzwedel",
+    "SB":"Saarbrücken",
+    "SBG":"Strasburg (historisch)",
+    "SBK":"Schönebeck (historisch)",
+    "SC":"Schwabach",
+    "SCZ":"Schleiz (historisch)",
+    "SDH":"Sondershausen (historisch)",
+    "SDL":"Stendal",
+    "SDT":"Schwedt (historisch)",
+    "SE":"Segeberg",
+    "SEB":"Sebnitz (historisch)",
+    "SEE":"Seelow (historisch)",
+    "SEF":"Scheinfeld (historisch)",
+    "SEL":"Selb (historisch)",
+    "SFA":"Soltau-Fallingbostel (historisch)",
+    "SFB":"Senftenberg (historisch)",
+    "SFT":"Staßfurt (historisch)",
+    "SG":"Solingen",
+    "SH":"Steinburg (historisch)",
+    "SHA":"Schwäbisch Hall",
+    "SHG":"Schaumburg",
+    "SHK":"Saale-Holzland-Kreis",
+    "SHL":"Suhl",
+    "SI":"Siegen-Wittgenstein",
+    "SIG":"Sigmaringen",
+    "SIM":"Rhein-Hunsrück-Kreis",
+    "SK":"Saalekreis",
+    "SL":"Schleswig-Flensburg",
+    "SLF":"Saalfeld-Rudolstadt",
+    "SLS":"Saarlouis",
+    "SLÜ":"Schlüchtern (historisch)",
+    "SLZ":"Salzungen (historisch)",
+    "SM":"Schmalkalden-Meiningen",
+    "SN":"Schwerin",
+    "SO":"Soest",
+    "SOB":"Schrobenhausen (historisch)",
+    "SOG":"Schongau (historisch)",
+    "SOK":"Saale-Orla-Kreis",
+    "SÖM":"Sömmerda",
+    "SON":"Sonneberg",
+    "SP":"Speyer",
+    "SPB":"Spremberg (historisch)",
+    "SPN":"Spree-Neiße",
+    "SPR":"Springe (historisch)",
+    "SR":"Straubing",
+    "ST":"Steinfurt",
+    "STA":"Starnberg",
+    "STD":"Stade",
+    "STE":"Staffelstein (historisch)",
+    "STH":"Stadthagen (historisch)",
+    "STL":"Stollberg (historisch)",
+    "SU":"Rhein-Sieg-Kreis",
+    "SUL":"Sulzbach-Rosenberg (historisch)",
+    "SÜW":"Südliche Weinstraße",
+    "SW":"Schweinfurt",
+    "SWA":"Rheingau-Taunus-Kreis",
+    "SY":"Syke (historisch)",
+    "SZ":"Salzgitter",
+
+    "TBB":"Main-Tauber-Kreis",
+    "TDO":"Nordsachsen",
+    "TE":"Tecklenburg (historisch)",
+    "TET":"Teterow (historisch)",
+    "TF":"Teltow-Fläming",
+    "TG":"Torgau (historisch)",
+    "THL":"Thüringen (historisch)",
+    "TIR":"Tirschenreuth",
+    "TO":"Torgau (historisch)",
+    "TÖL":"Bad Tölz-Wolfratshausen",
+    "TP":"Templin (historisch)",
+    "TR":"Trier",
+    "TS":"Traunstein",
+    "TT":"Tettnang (historisch)",
+    "TUT":"Tuttlingen",
+
+    "UE":"Uelzen",
+    "UEM":"Ueckermünde (historisch)",
+    "UFF":"Uffenheim (historisch)",
+    "UH":"Unstrut-Hainich-Kreis",
+    "UL":"Ulm",
+    "UM":"Uckermark",
+    "UN":"Unna",
+
+    "V":"Vogtlandkreis",
+    "VB":"Vogelsbergkreis",
+    "VEC":"Vechta",
+    "VER":"Verden",
+    "VG":"Vorpommern-Greifswald",
+    "VIB":"Vilsbiburg (historisch)",
+    "VIE":"Viersen",
+    "VK":"Völklingen",
+    "VOH":"Vohenstrauß (historisch)",
+    "VR":"Vorpommern-Rügen",
+    "VS":"Schwarzwald-Baar-Kreis",
+
+    "W":"Wuppertal",
+    "WAF":"Warendorf",
+    "WAK":"Wartburgkreis",
+    "WAN":"Wanne-Eickel (historisch)",
+    "WAR":"Warburg (historisch)",
+    "WAT":"Wattenscheid (historisch)",
+    "WB":"Wittenberg",
+    "WBS":"Worbis (historisch)",
+    "WDA":"Werdau (historisch)",
+    "WE":"Weimar",
+    "WEL":"Weilburg (historisch)",
+    "WEN":"Weiden in der Oberpfalz",
+    "WER":"Wertingen (historisch)",
+    "WES":"Wesel",
+    "WF":"Wolfenbüttel",
+    "WG":"Wangen (historisch)",
+    "WHV":"Wilhelmshaven",
+    "WI":"Wiesbaden",
+    "WIL":"Bernkastel-Wittlich",
+    "WIS":"Wismar (historisch)",
+    "WIT":"Witten (historisch)",
+    "WIZ":"Witzenhausen (historisch)",
+    "WK":"Wittstock (historisch)",
+    "WL":"Harburg",
+    "WLG":"Wolgast (historisch)",
+    "WM":"Weilheim-Schongau",
+    "WMS":"Wolmirstedt (historisch)",
+    "WN":"Rems-Murr-Kreis",
+    "WND":"St. Wendel",
+    "WO":"Worms",
+    "WOB":"Wolfsburg",
+    "WOH":"Wolfhagen (historisch)",
+    "WOL":"Wolfach (historisch)",
+    "WOR":"Wolfratshausen (historisch)",
+    "WOS":"Wolfstein (historisch)",
+    "WR":"Wernigerode (historisch)",
+    "WRN":"Waren (historisch)",
+    "WS":"Wasserburg am Inn (historisch)",
+    "WSF":"Weißenfels (historisch)",
+    "WST":"Ammerland",
+    "WSW":"Weißwasser",
+    "WT":"Waldshut",
+    "WTM":"Wittmund",
+    "WÜ":"Würzburg",
+    "WUG":"Weißenburg-Gunzenhausen",
+    "WÜM":"Waldmünchen (historisch)",
+    "WUN":"Wunsiedel",
+    "WUR":"Wurzen (historisch)",
+    "WW":"Westerwaldkreis",
+    "WZ":"Wetzlar (historisch)",
+
+    "Z":"Zwickau",
+    "ZE":"Zerbst (historisch)",
+    "ZI":"Zittau (historisch)",
+    "ZP":"Zschopau (historisch)",
+    "ZR":"Zeulenroda (historisch)",
+    "ZS":"Zossen (historisch)"
+  };
 
   function normalize(value) {
     return value.toLocaleUpperCase("de-DE").replace(/[\s-]+/g, "");
   }
+
   function formatPlate(value) {
     const cleaned = value.trim().toLocaleUpperCase("de-DE").replace(/\s+/g, " ");
-    // Format common German-style plates when the user omits the space before digits.
-    const match = cleaned.replace(/-/g, " ").match(/^([A-ZÄÖÜ]{1,3})\s*([A-Z]{1,2})\s*(\d{1,4})([HE])?$/);
-    if (match) return `${match[1]} ${match[2]} ${match[3]}${match[4] || ""}`;
+    const match = cleaned.replace(/-/g, " ").match(
+      /^([A-ZÄÖÜ]{1,3})\s*([A-Z]{1,2})\s*(\d{1,4})([HE])?$/
+    );
+    if (match) {
+      return `${match[1]} ${match[2]} ${match[3]}${match[4] || ""}`;
+    }
     return cleaned;
   }
-  function save() {
-    try { localStorage.setItem(KEY, JSON.stringify(plates)); }
-    catch (_) { showNotice("Speichern nicht möglich. Bitte exportiere deine Sammlung als Sicherung.", "warn"); }
+
+  function getRegionName(plate) {
+    const match = plate.trim().toLocaleUpperCase("de-DE")
+      .match(/^([A-ZÄÖÜ]{1,3})(?=[\s-])/);
+
+    if (!match) return "Region nicht erkannt";
+
+    return GERMAN_REGIONS[match[1]] ||
+      "Region noch nicht hinterlegt";
   }
+
+  function save() {
+    try {
+      localStorage.setItem(KEY, JSON.stringify(plates));
+    } catch (_) {
+      showNotice("Speichern nicht möglich. Bitte exportiere deine Sammlung.", "warn");
+    }
+  }
+
   function load() {
     try {
       const saved = JSON.parse(localStorage.getItem(KEY) || "null");
-      if (Array.isArray(saved)) plates = saved.filter(x => typeof x === "string");
-      else plates = ["HH MK 2394"];
-    } catch (_) { plates = ["HH MK 2394"]; }
+      if (Array.isArray(saved)) {
+        plates = saved.filter(x => typeof x === "string");
+      } else {
+        plates = ["HH MK 2394"];
+      }
+    } catch (_) {
+      plates = ["HH MK 2394"];
+    }
     save();
   }
+
   function showNotice(text, type="") {
-    const el = $("notice"); el.textContent = text; el.className = "notice " + type; el.hidden = false;
+    const el = $("notice");
+    el.textContent = text;
+    el.className = "notice " + type;
+    el.hidden = false;
   }
+
   function keyParts(plate) {
     const s = plate.trim().toLocaleUpperCase("de-DE");
     const m = s.match(/^([A-ZÄÖÜ]{1,3})[\s-]+([A-Z]{1,2})\b/);
     if (m) return {region:m[1], letters:m[2]};
-    // For other global formats, use the first group as region and next alphabetic group as letters.
+
     const groups = s.split(/[\s-]+/);
     const alpha = groups.filter(g => /^[A-ZÄÖÜ]+$/.test(g));
     return {region:alpha[0] || s, letters:alpha[1] || alpha[0] || s};
   }
+
   function render() {
     $("count").textContent = plates.length;
     const query = normalize($("search").value);
-    const shown = [...plates].filter(p => normalize(p).includes(query)).sort((a,b) => {
-      const ka = keyParts(a), kb = keyParts(b);
-      const first = sortMode === "region" ? ka.region.localeCompare(kb.region) : ka.letters.localeCompare(kb.letters);
-      return first || a.localeCompare(b, "de");
-    });
-    const list = $("plateList"); list.replaceChildren();
+
+    const shown = [...plates]
+      .filter(p => normalize(p).includes(query))
+      .sort((a,b) => {
+        const ka = keyParts(a), kb = keyParts(b);
+        const first = sortMode === "region"
+          ? ka.region.localeCompare(kb.region)
+          : ka.letters.localeCompare(kb.letters);
+        return first || a.localeCompare(b, "de");
+      });
+
+    const list = $("plateList");
+    list.replaceChildren();
     $("empty").hidden = shown.length !== 0;
+
     shown.forEach((p, i) => {
-      const li = document.createElement("li"); li.className = "item";
+      const li = document.createElement("li");
+      li.className = "item";
+
       const left = document.createElement("div");
-      const n = document.createElement("span"); n.className = "num"; n.textContent = String(i+1);
-      const name = document.createElement("span"); name.className = "plate"; name.textContent = p;
-      left.append(n,name);
-      const del = document.createElement("button"); del.className = "danger"; del.type = "button"; del.textContent = "Löschen"; del.setAttribute("aria-label", p + " löschen");
+
+      const n = document.createElement("span");
+      n.className = "num";
+      n.textContent = String(i+1);
+
+      const name = document.createElement("span");
+      name.className = "plate";
+      name.textContent = p;
+
+      const region = document.createElement("small");
+      region.className = "region-label";
+      region.textContent = "(" + getRegionName(p) + ")";
+
+      left.append(n, name, region);
+
+      const del = document.createElement("button");
+      del.className = "danger";
+      del.type = "button";
+      del.textContent = "Löschen";
+      del.setAttribute("aria-label", p + " löschen");
+
       del.addEventListener("click", () => {
         if (!confirm("Kennzeichen " + p + " wirklich löschen?")) return;
-        plates = plates.filter(x => x !== p); save(); render(); showNotice("Kennzeichen gelöscht.");
+        plates = plates.filter(x => x !== p);
+        save();
+        render();
+        showNotice("Kennzeichen gelöscht.");
       });
-      li.append(left,del); list.append(li);
+
+      li.append(left, del);
+      list.append(li);
     });
   }
+
   $("addForm").addEventListener("submit", e => {
     e.preventDefault();
+
     const raw = $("plateInput").value;
-    if (!raw.trim()) { showNotice("Bitte gib ein Kennzeichen ein.", "warn"); return; }
-    const plate = formatPlate(raw);
-    if (plates.some(p => normalize(p) === normalize(plate))) {
-      showNotice("Dieses Kennzeichen hast du bereits gesammelt: " + plate, "warn"); return;
+    if (!raw.trim()) {
+      showNotice("Bitte gib ein Kennzeichen ein.", "warn");
+      return;
     }
-    plates.push(plate); save(); $("plateInput").value = ""; render();
+
+    const plate = formatPlate(raw);
+
+    if (plates.some(p => normalize(p) === normalize(plate))) {
+      showNotice("Dieses Kennzeichen hast du bereits gesammelt: " + plate, "warn");
+      return;
+    }
+
+    plates.push(plate);
+    save();
+    $("plateInput").value = "";
+    render();
+
     showNotice("Gespeichert: " + plate, "good");
   });
+
   $("search").addEventListener("input", render);
   $("sortRegion").addEventListener("click", () => setSort("region"));
   $("sortLetters").addEventListener("click", () => setSort("letters"));
+
   function setSort(mode) {
     sortMode = mode;
     $("sortRegion").classList.toggle("active", mode === "region");
@@ -159,57 +887,53 @@ footer{color:var(--muted);font-size:.82rem;margin-top:22px}
     $("sortLetters").setAttribute("aria-pressed", String(mode === "letters"));
     render();
   }
+
   $("exportBtn").addEventListener("click", () => {
-    const blob = new Blob([JSON.stringify({app:"Kennzeichen-Sammler",version:1,plates},null,2)], {type:"application/json"});
-    const url = URL.createObjectURL(blob); const a = document.createElement("a");
-    a.href = url; a.download = "kennzeichen-sammlung-sicherung.json"; a.click(); URL.revokeObjectURL(url);
+    const blob = new Blob([
+      JSON.stringify({app:"Kennzeichen-Sammler",version:1,plates},null,2)
+    ], {type:"application/json"});
+
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "kennzeichen-sammlung-sicherung.json";
+    a.click();
+    URL.revokeObjectURL(url);
     showNotice("Sicherung wurde exportiert.", "good");
   });
+
   $("importFile").addEventListener("change", async e => {
-    const file = e.target.files && e.target.files[0]; if (!file) return;
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+
     try {
       const data = JSON.parse(await file.text());
       if (!Array.isArray(data.plates)) throw new Error("Ungültige Sicherungsdatei");
+
       const merged = [...plates];
-      for (const item of data.plates) if (typeof item === "string" && !merged.some(p => normalize(p) === normalize(item))) merged.push(formatPlate(item));
-      plates = merged; save(); render(); showNotice("Sicherung importiert. Doppelte Einträge wurden übersprungen.", "good");
-    } catch (_) { showNotice("Die Datei konnte nicht gelesen werden. Bitte eine Sicherung aus dieser App auswählen.", "warn"); }
+
+      for (const item of data.plates) {
+        if (typeof item === "string" &&
+          !merged.some(p => normalize(p) === normalize(item))) {
+          merged.push(formatPlate(item));
+        }
+      }
+
+      plates = merged;
+      save();
+      render();
+      showNotice("Sicherung importiert. Doppelte Einträge wurden übersprungen.", "good");
+    } catch (_) {
+      showNotice("Die Datei konnte nicht gelesen werden.", "warn");
+    }
+
     e.target.value = "";
   });
-  load(); render();
+
+  load();
+  render();
 })();
 </script>
 </body>
-</html>'''
+</html>
 
-(out / "index.html").write_text(html, encoding="utf-8")
-readme = """# Kennzeichen-Sammler
-
-## Auf GitHub Pages veröffentlichen
-1. Öffne dein GitHub-Konto und erstelle ein neues Repository, z. B. `kennzeichen-sammler`.
-2. Wähle `Public` (GitHub Pages im kostenlosen Tarif benötigt in der Regel ein öffentliches Repository).
-3. Lade die Datei `index.html` in das Hauptverzeichnis hoch.
-4. Öffne im Repository **Settings → Pages**.
-5. Bei **Build and deployment** wähle **Deploy from a branch**.
-6. Wähle Branch **main** und Ordner **/(root)**, dann **Save**.
-7. Warte kurz. GitHub zeigt dir dort die veröffentlichte Website-Adresse an.
-
-## Wichtig zur Speicherung
-Die Kennzeichen werden mit `localStorage` im Browser auf dem jeweiligen Gerät gespeichert.
-Das synchronisiert nicht zwischen Geräten und kann verloren gehen, wenn Browserdaten gelöscht werden.
-Nutze in der App regelmäßig **Sicherung exportieren** und bewahre die JSON-Datei sicher auf.
-Beim Gerätewechsel kannst du sie mit **Sicherung importieren** wiederherstellen.
-
-Die App enthält als ersten Eintrag `HH MK 2394`.
-"""
-(out / "README.txt").write_text(readme, encoding="utf-8")
-
-zip_path = Path("/mnt/data/kennzeichen-sammler-dateien.zip")
-with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as z:
-    z.write(out / "index.html", "kennzeichen-sammler/index.html")
-    z.write(out / "README.txt", "kennzeichen-sammler/README.txt")
-
-print("Dateien erstellt:")
-print(out / "index.html")
-print(out / "README.txt")
-print(zip_path)
